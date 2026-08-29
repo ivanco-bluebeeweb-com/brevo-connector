@@ -1,0 +1,660 @@
+{
+  "manifest_schema_version": 3,
+  "sdk_version": "5.13.0",
+  "app_id": "brevo-connector",
+  "version": "0.1.0",
+  "name": "Brevo",
+  "description": "Connect Brevo with an API key to manage contacts, lists, campaigns, and transactional email.",
+  "icon": "icon.svg",
+  "actions_explicit": true,
+  "system": false,
+  "capabilities": [
+    "brevo:read",
+    "brevo:write"
+  ],
+  "tools": [
+    {
+      "name": "connect_brevo",
+      "description": "Connect Brevo using an API key after verifying it against the account endpoint.",
+      "action_type": "write",
+      "chain_callable": true,
+      "effects": [
+        "create:connection"
+      ],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "label": {
+            "default": "",
+            "description": "Friendly label, e.g. Marketing workspace.",
+            "title": "Label",
+            "type": "string"
+          },
+          "api_key": {
+            "description": "Brevo API key from SMTP & API > API Keys.",
+            "title": "Api Key",
+            "type": "string"
+          }
+        },
+        "required": [
+          "api_key"
+        ],
+        "title": "ConnectBrevoParams",
+        "type": "object"
+      },
+      "return_schema": {},
+      "event": "",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "tool_brevo-connector_chat"
+    },
+    {
+      "name": "disconnect_brevo",
+      "description": "Disconnect a Brevo account and delete only its locally saved API key.",
+      "action_type": "write",
+      "chain_callable": true,
+      "effects": [
+        "delete:connection"
+      ],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "connection_id": {
+            "title": "Connection Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "connection_id"
+        ],
+        "title": "DisconnectParams",
+        "type": "object"
+      },
+      "return_schema": {},
+      "event": "",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "tool_brevo-connector_chat"
+    },
+    {
+      "name": "list_connections",
+      "description": "List saved Brevo accounts without exposing their API keys.",
+      "action_type": "read",
+      "chain_callable": true,
+      "effects": [],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {},
+        "title": "NoParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "$defs": {
+          "Connection": {
+            "properties": {
+              "id": {
+                "default": "",
+                "title": "Id",
+                "type": "string"
+              },
+              "label": {
+                "default": "",
+                "title": "Label",
+                "type": "string"
+              },
+              "email": {
+                "default": "",
+                "title": "Email",
+                "type": "string"
+              }
+            },
+            "title": "Connection",
+            "type": "object"
+          }
+        },
+        "properties": {
+          "connections": {
+            "items": {
+              "$ref": "#/$defs/Connection"
+            },
+            "title": "Connections",
+            "type": "array"
+          }
+        },
+        "title": "ConnectionList",
+        "type": "object"
+      },
+      "event": "",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "tool_brevo-connector_chat"
+    },
+    {
+      "name": "list_contacts",
+      "description": "List contacts in the connected Brevo account.",
+      "action_type": "read",
+      "chain_callable": true,
+      "effects": [],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Saved Brevo account id; omit when only one account is connected.",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "limit": {
+            "default": 20,
+            "maximum": 100,
+            "minimum": 1,
+            "title": "Limit",
+            "type": "integer"
+          }
+        },
+        "title": "ListContactsParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "$defs": {
+          "Contact": {
+            "properties": {
+              "email": {
+                "default": "",
+                "title": "Email",
+                "type": "string"
+              },
+              "id": {
+                "default": 0,
+                "title": "Id",
+                "type": "integer"
+              },
+              "attributes": {
+                "additionalProperties": true,
+                "title": "Attributes",
+                "type": "object"
+              }
+            },
+            "title": "Contact",
+            "type": "object"
+          }
+        },
+        "properties": {
+          "contacts": {
+            "items": {
+              "$ref": "#/$defs/Contact"
+            },
+            "title": "Contacts",
+            "type": "array"
+          }
+        },
+        "title": "ContactList",
+        "type": "object"
+      },
+      "event": "",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "tool_brevo-connector_chat"
+    },
+    {
+      "name": "create_contact",
+      "description": "Create or update a Brevo contact, optionally adding it to existing lists.",
+      "action_type": "write",
+      "chain_callable": true,
+      "effects": [
+        "create:contact"
+      ],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Saved Brevo account id; omit when only one account is connected.",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "email": {
+            "title": "Email",
+            "type": "string"
+          },
+          "attributes": {
+            "additionalProperties": true,
+            "description": "Contact attributes, e.g. {'FIRSTNAME':'Ada'}.",
+            "title": "Attributes",
+            "type": "object"
+          },
+          "list_ids": {
+            "description": "Optional existing Brevo list IDs.",
+            "items": {
+              "type": "integer"
+            },
+            "title": "List Ids",
+            "type": "array"
+          }
+        },
+        "required": [
+          "email"
+        ],
+        "title": "CreateContactParams",
+        "type": "object"
+      },
+      "return_schema": {},
+      "event": "",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "tool_brevo-connector_chat"
+    },
+    {
+      "name": "list_mailing_lists",
+      "description": "List audience lists in the connected Brevo account.",
+      "action_type": "read",
+      "chain_callable": true,
+      "effects": [],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Saved Brevo account id; omit when only one account is connected.",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "limit": {
+            "default": 20,
+            "maximum": 50,
+            "minimum": 1,
+            "title": "Limit",
+            "type": "integer"
+          }
+        },
+        "title": "ListListsParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "$defs": {
+          "MailingList": {
+            "properties": {
+              "id": {
+                "default": 0,
+                "title": "Id",
+                "type": "integer"
+              },
+              "name": {
+                "default": "",
+                "title": "Name",
+                "type": "string"
+              },
+              "total_blacklisted": {
+                "default": 0,
+                "title": "Total Blacklisted",
+                "type": "integer"
+              },
+              "total_subscribers": {
+                "default": 0,
+                "title": "Total Subscribers",
+                "type": "integer"
+              }
+            },
+            "title": "MailingList",
+            "type": "object"
+          }
+        },
+        "properties": {
+          "lists": {
+            "items": {
+              "$ref": "#/$defs/MailingList"
+            },
+            "title": "Lists",
+            "type": "array"
+          }
+        },
+        "title": "MailingListList",
+        "type": "object"
+      },
+      "event": "",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "tool_brevo-connector_chat"
+    },
+    {
+      "name": "create_mailing_list",
+      "description": "Create a new Brevo contact list.",
+      "action_type": "write",
+      "chain_callable": true,
+      "effects": [
+        "create:list"
+      ],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Saved Brevo account id; omit when only one account is connected.",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "CreateListParams",
+        "type": "object"
+      },
+      "return_schema": {},
+      "event": "",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "tool_brevo-connector_chat"
+    },
+    {
+      "name": "list_campaigns",
+      "description": "List email campaigns in the connected Brevo account.",
+      "action_type": "read",
+      "chain_callable": true,
+      "effects": [],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Saved Brevo account id; omit when only one account is connected.",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "limit": {
+            "default": 20,
+            "maximum": 100,
+            "minimum": 1,
+            "title": "Limit",
+            "type": "integer"
+          }
+        },
+        "title": "ListCampaignsParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "$defs": {
+          "Campaign": {
+            "properties": {
+              "id": {
+                "default": 0,
+                "title": "Id",
+                "type": "integer"
+              },
+              "name": {
+                "default": "",
+                "title": "Name",
+                "type": "string"
+              },
+              "status": {
+                "default": "",
+                "title": "Status",
+                "type": "string"
+              },
+              "type": {
+                "default": "",
+                "title": "Type",
+                "type": "string"
+              },
+              "sent_date": {
+                "default": "",
+                "title": "Sent Date",
+                "type": "string"
+              }
+            },
+            "title": "Campaign",
+            "type": "object"
+          }
+        },
+        "properties": {
+          "campaigns": {
+            "items": {
+              "$ref": "#/$defs/Campaign"
+            },
+            "title": "Campaigns",
+            "type": "array"
+          }
+        },
+        "title": "CampaignList",
+        "type": "object"
+      },
+      "event": "",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "tool_brevo-connector_chat"
+    },
+    {
+      "name": "create_campaign",
+      "description": "Create a draft Brevo email campaign for specified existing lists; it is not sent automatically.",
+      "action_type": "write",
+      "chain_callable": true,
+      "effects": [
+        "create:campaign"
+      ],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Saved Brevo account id; omit when only one account is connected.",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "subject": {
+            "title": "Subject",
+            "type": "string"
+          },
+          "sender_name": {
+            "title": "Sender Name",
+            "type": "string"
+          },
+          "sender_email": {
+            "title": "Sender Email",
+            "type": "string"
+          },
+          "html_content": {
+            "title": "Html Content",
+            "type": "string"
+          },
+          "recipient_list_ids": {
+            "description": "Existing Brevo list IDs to receive this campaign.",
+            "items": {
+              "type": "integer"
+            },
+            "title": "Recipient List Ids",
+            "type": "array"
+          }
+        },
+        "required": [
+          "name",
+          "subject",
+          "sender_name",
+          "sender_email",
+          "html_content",
+          "recipient_list_ids"
+        ],
+        "title": "CreateCampaignParams",
+        "type": "object"
+      },
+      "return_schema": {},
+      "event": "",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "tool_brevo-connector_chat"
+    },
+    {
+      "name": "send_transactional_email",
+      "description": "Send one transactional email through Brevo to an explicit recipient.",
+      "action_type": "write",
+      "chain_callable": true,
+      "effects": [
+        "send:email"
+      ],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Saved Brevo account id; omit when only one account is connected.",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "sender_email": {
+            "title": "Sender Email",
+            "type": "string"
+          },
+          "sender_name": {
+            "default": "",
+            "title": "Sender Name",
+            "type": "string"
+          },
+          "to_email": {
+            "title": "To Email",
+            "type": "string"
+          },
+          "to_name": {
+            "default": "",
+            "title": "To Name",
+            "type": "string"
+          },
+          "subject": {
+            "title": "Subject",
+            "type": "string"
+          },
+          "html_content": {
+            "title": "Html Content",
+            "type": "string"
+          }
+        },
+        "required": [
+          "sender_email",
+          "to_email",
+          "subject",
+          "html_content"
+        ],
+        "title": "SendTransactionalEmailParams",
+        "type": "object"
+      },
+      "return_schema": {},
+      "event": "",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "tool_brevo-connector_chat"
+    },
+    {
+      "name": "audit_brevo_account",
+      "description": "Build an aggregated Brevo account overview: account identity, plans, contacts, lists, and campaigns.",
+      "action_type": "read",
+      "chain_callable": true,
+      "effects": [],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Saved Brevo account id; omit when only one account is connected.",
+            "title": "Connection Id",
+            "type": "string"
+          }
+        },
+        "title": "AuditBrevoAccountParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "properties": {
+          "email": {
+            "default": "",
+            "title": "Email",
+            "type": "string"
+          },
+          "company_name": {
+            "default": "",
+            "title": "Company Name",
+            "type": "string"
+          },
+          "plan": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Plan",
+            "type": "array"
+          },
+          "total_contacts": {
+            "default": 0,
+            "title": "Total Contacts",
+            "type": "integer"
+          },
+          "total_lists": {
+            "default": 0,
+            "title": "Total Lists",
+            "type": "integer"
+          },
+          "total_campaigns": {
+            "default": 0,
+            "title": "Total Campaigns",
+            "type": "integer"
+          }
+        },
+        "title": "BrevoAccountReport",
+        "type": "object"
+      },
+      "event": "",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "tool_brevo-connector_chat"
+    }
+  ],
+  "signals": [],
+  "schedules": [],
+  "required_scopes": [],
+  "icon_size_bytes": 677,
+  "panels": [
+    {
+      "panel_id": "home",
+      "slot": "left",
+      "title": "",
+      "tree": {},
+      "icon": "",
+      "refresh": "manual",
+      "center_overlay": false
+    },
+    {
+      "panel_id": "brevo_setup",
+      "slot": "overlay",
+      "title": "",
+      "tree": {},
+      "icon": "",
+      "refresh": "manual",
+      "center_overlay": false
+    },
+    {
+      "panel_id": "brevo_settings",
+      "slot": "center",
+      "title": "",
+      "tree": {},
+      "icon": "",
+      "refresh": "manual",
+      "center_overlay": false
+    }
+  ]
+}
