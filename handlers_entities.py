@@ -24,7 +24,7 @@ async def list_contacts(ctx, params: ListContactsParams) -> ActionResult:
     except br.ClientFail as exc: return _error(exc)
     return ActionResult.ok(ContactList(contacts=[Contact(email=x.get("email", ""), id=x.get("id", 0), attributes=x.get("attributes", {})) for x in data.get("contacts", [])]))
 
-@chat.function("create_contact", "Create or update a Brevo contact, optionally adding it to existing lists.", action_type="write", chain_callable=True, effects=["create:contact"])
+@chat.function("create_contact", "Create or update a Brevo contact, optionally adding it to existing lists.", action_type="write", chain_callable=True, effects=["create:contact"], event="brevo-connector.create_contact", data_model=ContactResult)
 async def create_contact(ctx, params: CreateContactParams) -> ActionResult:
     """Create a contact through Brevo's contacts endpoint."""
     conn, err = await resolve_or_error(ctx, params.connection_id)
@@ -45,7 +45,7 @@ async def list_mailing_lists(ctx, params: ListListsParams) -> ActionResult:
     except br.ClientFail as exc: return _error(exc)
     return ActionResult.ok(MailingListList(lists=[MailingList(id=x.get("id", 0), name=x.get("name", ""), total_blacklisted=x.get("totalBlacklisted", 0), total_subscribers=x.get("totalSubscribers", 0)) for x in data.get("lists", [])]))
 
-@chat.function("create_mailing_list", "Create a new Brevo contact list.", action_type="write", chain_callable=True, effects=["create:list"])
+@chat.function("create_mailing_list", "Create a new Brevo contact list.", action_type="write", chain_callable=True, effects=["create:list"], event="brevo-connector.create_mailing_list", data_model=ListResult)
 async def create_mailing_list(ctx, params: CreateListParams) -> ActionResult:
     """Create an audience list."""
     conn, err = await resolve_or_error(ctx, params.connection_id)
@@ -65,7 +65,7 @@ async def list_campaigns(ctx, params: ListCampaignsParams) -> ActionResult:
     except br.ClientFail as exc: return _error(exc)
     return ActionResult.ok(CampaignList(campaigns=[Campaign(id=x.get("id", 0), name=x.get("name", ""), status=x.get("status", ""), type=x.get("type", ""), sent_date=x.get("sentDate", "")) for x in data.get("campaigns", [])]))
 
-@chat.function("create_campaign", "Create a draft Brevo email campaign for specified existing lists; it is not sent automatically.", action_type="write", chain_callable=True, effects=["create:campaign"])
+@chat.function("create_campaign", "Create a draft Brevo email campaign for specified existing lists; it is not sent automatically.", action_type="write", chain_callable=True, effects=["create:campaign"], event="brevo-connector.create_campaign", data_model=CampaignResult)
 async def create_campaign(ctx, params: CreateCampaignParams) -> ActionResult:
     """Create a campaign draft; sending remains a deliberate provider-side action."""
     conn, err = await resolve_or_error(ctx, params.connection_id)
@@ -76,7 +76,7 @@ async def create_campaign(ctx, params: CreateCampaignParams) -> ActionResult:
     except br.ClientFail as exc: return _error(exc)
     return ActionResult.ok(CampaignResult(id=data.get("id", 0), name=params.name))
 
-@chat.function("send_transactional_email", "Send one transactional email through Brevo to an explicit recipient.", action_type="write", chain_callable=True, effects=["send:email"])
+@chat.function("send_transactional_email", "Send one transactional email through Brevo to an explicit recipient.", action_type="write", chain_callable=True, effects=["send:email"], event="brevo-connector.send_transactional_email", data_model=TransactionalEmailResult)
 async def send_transactional_email(ctx, params: SendTransactionalEmailParams) -> ActionResult:
     """Send a single explicitly addressed transactional message."""
     conn, err = await resolve_or_error(ctx, params.connection_id)

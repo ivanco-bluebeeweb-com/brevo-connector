@@ -32,7 +32,7 @@ async def resolve_or_error(ctx, connection_id: str = ""):
         return None, ActionResult.error("No Brevo account found. Connect one with connect_brevo first.", code=br.BR_NOT_CONNECTED)
     return item, None
 
-@chat.function("connect_brevo", "Connect Brevo using an API key after verifying it against the account endpoint.", action_type="write", chain_callable=True, effects=["create:connection"])
+@chat.function("connect_brevo", "Connect Brevo using an API key after verifying it against the account endpoint.", action_type="write", chain_callable=True, effects=["create:connection"], event="brevo-connector.connect_brevo", data_model=ConnectionResult)
 async def connect_brevo(ctx, params: ConnectBrevoParams) -> ActionResult:
     """Verify the supplied API key then store it in the encrypted secret store."""
     try:
@@ -48,7 +48,7 @@ async def connect_brevo(ctx, params: ConnectBrevoParams) -> ActionResult:
     await _save(ctx, items)
     return ActionResult.ok(ConnectionResult(connection_id=connection_id, label=items[-1]["label"]))
 
-@chat.function("disconnect_brevo", "Disconnect a Brevo account and delete only its locally saved API key.", action_type="write", chain_callable=True, effects=["delete:connection"])
+@chat.function("disconnect_brevo", "Disconnect a Brevo account and delete only its locally saved API key.", action_type="write", chain_callable=True, effects=["delete:connection"], event="brevo-connector.disconnect_brevo", data_model=DeleteResult)
 async def disconnect_brevo(ctx, params: DisconnectParams) -> ActionResult:
     """Forget one saved Brevo credential without changing the Brevo account."""
     items = await _load(ctx)

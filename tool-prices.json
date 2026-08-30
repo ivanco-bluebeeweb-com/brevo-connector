@@ -1,0 +1,13 @@
+{
+  "connect_brevo": 0,
+  "disconnect_brevo": 0,
+  "list_connections": 0,
+  "list_contacts": 8,
+  "create_contact": 16,
+  "list_mailing_lists": 8,
+  "create_mailing_list": 16,
+  "list_campaigns": 8,
+  "create_campaign": 16,
+  "send_transactional_email": 20,
+  "audit_brevo_account": 40
+}
