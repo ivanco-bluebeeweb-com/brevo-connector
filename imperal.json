@@ -42,8 +42,23 @@
         "title": "ConnectBrevoParams",
         "type": "object"
       },
-      "return_schema": {},
-      "event": "",
+      "return_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "label": {
+            "default": "",
+            "title": "Label",
+            "type": "string"
+          }
+        },
+        "title": "ConnectionResult",
+        "type": "object"
+      },
+      "event": "brevo-connector.connect_brevo",
       "background": false,
       "long_running": false,
       "scopes": [],
@@ -71,8 +86,23 @@
         "title": "DisconnectParams",
         "type": "object"
       },
-      "return_schema": {},
-      "event": "",
+      "return_schema": {
+        "properties": {
+          "deleted": {
+            "default": false,
+            "title": "Deleted",
+            "type": "boolean"
+          },
+          "id": {
+            "default": "",
+            "title": "Id",
+            "type": "string"
+          }
+        },
+        "title": "DeleteResult",
+        "type": "object"
+      },
+      "event": "brevo-connector.disconnect_brevo",
       "background": false,
       "long_running": false,
       "scopes": [],
@@ -242,8 +272,23 @@
         "title": "CreateContactParams",
         "type": "object"
       },
-      "return_schema": {},
-      "event": "",
+      "return_schema": {
+        "properties": {
+          "id": {
+            "default": 0,
+            "title": "Id",
+            "type": "integer"
+          },
+          "email": {
+            "default": "",
+            "title": "Email",
+            "type": "string"
+          }
+        },
+        "title": "ContactResult",
+        "type": "object"
+      },
+      "event": "brevo-connector.create_contact",
       "background": false,
       "long_running": false,
       "scopes": [],
@@ -350,8 +395,23 @@
         "title": "CreateListParams",
         "type": "object"
       },
-      "return_schema": {},
-      "event": "",
+      "return_schema": {
+        "properties": {
+          "id": {
+            "default": 0,
+            "title": "Id",
+            "type": "integer"
+          },
+          "name": {
+            "default": "",
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "title": "ListResult",
+        "type": "object"
+      },
+      "event": "brevo-connector.create_mailing_list",
       "background": false,
       "long_running": false,
       "scopes": [],
@@ -492,8 +552,23 @@
         "title": "CreateCampaignParams",
         "type": "object"
       },
-      "return_schema": {},
-      "event": "",
+      "return_schema": {
+        "properties": {
+          "id": {
+            "default": 0,
+            "title": "Id",
+            "type": "integer"
+          },
+          "name": {
+            "default": "",
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "title": "CampaignResult",
+        "type": "object"
+      },
+      "event": "brevo-connector.create_campaign",
       "background": false,
       "long_running": false,
       "scopes": [],
@@ -552,8 +627,18 @@
         "title": "SendTransactionalEmailParams",
         "type": "object"
       },
-      "return_schema": {},
-      "event": "",
+      "return_schema": {
+        "properties": {
+          "message_id": {
+            "default": "",
+            "title": "Message Id",
+            "type": "string"
+          }
+        },
+        "title": "TransactionalEmailResult",
+        "type": "object"
+      },
+      "event": "brevo-connector.send_transactional_email",
       "background": false,
       "long_running": false,
       "scopes": [],
@@ -628,6 +713,11 @@
   "schedules": [],
   "required_scopes": [],
   "icon_size_bytes": 677,
+  "lifecycle": {
+    "health_check": {
+      "interval_sec": 60
+    }
+  },
   "panels": [
     {
       "panel_id": "home",
