@@ -746,5 +746,15 @@
       "refresh": "manual",
       "center_overlay": false
     }
+  ],
+  "secrets": [
+    {
+      "name": "brevo_connections",
+      "description": "JSON array of connected Brevo accounts/credentials. Managed by the app's connect/disconnect tools.",
+      "required": false,
+      "write_mode": "both",
+      "max_bytes": 16384,
+      "scope": "user"
+    }
   ]
 }
