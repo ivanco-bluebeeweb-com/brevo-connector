@@ -23,10 +23,10 @@ async def audit_brevo_account(ctx, params: AuditBrevoAccountParams) -> ActionRes
         campaigns = await br.request(conn["api_key"], "GET", "/emailCampaigns", params={"limit": 1}, action="count campaigns")
     except br.ClientFail as exc:
         return ActionResult.error(exc.payload["message"], code=exc.payload["code"])
-    return ActionResult.ok(BrevoAccountReport(
+    return ActionResult.success(BrevoAccountReport(
         email=account.get("email", ""), company_name=account.get("companyName", ""),
         plan=account.get("plan", []),
         total_contacts=int(contacts.get("count", 0)),
         total_lists=int(lists.get("count", 0)),
         total_campaigns=int(campaigns.get("count", 0)),
-    ))
+    ), summary="Brevo account audit ready.")

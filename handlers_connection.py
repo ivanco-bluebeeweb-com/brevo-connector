@@ -46,7 +46,7 @@ async def connect_brevo(ctx, params: ConnectBrevoParams) -> ActionResult:
         "email": account.get("email", ""), "api_key": params.api_key,
     })
     await _save(ctx, items)
-    return ActionResult.ok(ConnectionResult(connection_id=connection_id, label=items[-1]["label"]))
+    return ActionResult.success(ConnectionResult(connection_id=connection_id, label=items[-1]["label"]), summary="Brevo connected.")
 
 @chat.function("disconnect_brevo", "Disconnect a Brevo account and delete only its locally saved API key.", action_type="write", chain_callable=True, effects=["delete:connection"], event="brevo-connector.disconnect_brevo", data_model=DeleteResult)
 async def disconnect_brevo(ctx, params: DisconnectParams) -> ActionResult:
@@ -56,9 +56,9 @@ async def disconnect_brevo(ctx, params: DisconnectParams) -> ActionResult:
     if len(remaining) == len(items):
         return ActionResult.error("That Brevo connection was not found.", code=br.BR_NOT_FOUND)
     await _save(ctx, remaining)
-    return ActionResult.ok(DeleteResult(deleted=True, id=params.connection_id))
+    return ActionResult.success(DeleteResult(deleted=True, id=params.connection_id), summary="Brevo disconnected.")
 
 @chat.function("list_connections", "List saved Brevo accounts without exposing their API keys.", action_type="read", chain_callable=True, data_model=ConnectionList)
 async def list_connections(ctx, params: NoParams) -> ActionResult:
     """Return safe connection metadata only."""
-    return ActionResult.ok(ConnectionList(connections=[Connection(id=x.get("id", ""), label=x.get("label", ""), email=x.get("email", "")) for x in await _load(ctx)]))
+    return ActionResult.success(ConnectionList(connections=[Connection(id=x.get("id", ""), label=x.get("label", ""), email=x.get("email", "")) for x in await _load(ctx)]), summary="Connections listed.")
