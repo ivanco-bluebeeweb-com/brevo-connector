@@ -51,7 +51,7 @@ async def create_mailing_list(ctx, params: CreateListParams) -> ActionResult:
     conn, err = await resolve_or_error(ctx, params.connection_id)
     if err: return err
     try:
-        data = await br.request(conn["api_key"], "POST", "/contacts/lists", json_body={"name": params.name}, action="create list")
+        data = await br.request(conn["api_key"], "POST", "/contacts/lists", json_body={"name": params.name, "folderId": params.folder_id}, action="create list")
     except br.ClientFail as exc: return _error(exc)
     return ActionResult.success(ListResult(id=data.get("id", 0), name=params.name), summary="Mailing list created.")
 

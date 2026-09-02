@@ -30,7 +30,9 @@ class ListListsParams(Scoped):
     limit: int = Field(20, ge=1, le=50)
 class MailingList(BaseModel): id: int = 0; name: str = ""; total_blacklisted: int = 0; total_subscribers: int = 0
 class MailingListList(BaseModel): lists: list[MailingList] = Field(default_factory=list)
-class CreateListParams(Scoped): name: str
+class CreateListParams(Scoped):
+    name: str
+    folder_id: int = Field(1, description="Brevo folder ID to place the list in, defaults to 1.")
 class ListResult(BaseModel): id: int = 0; name: str = ""
 
 class ListCampaignsParams(Scoped):
