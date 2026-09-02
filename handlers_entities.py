@@ -24,7 +24,7 @@ async def list_contacts(ctx, params: ListContactsParams) -> ActionResult:
     except br.ClientFail as exc: return _error(exc)
     return ActionResult.success(ContactList(contacts=[Contact(email=x.get("email", ""), id=x.get("id", 0), attributes=x.get("attributes", {})) for x in data.get("contacts", [])]), summary="Contacts listed.")
 
-@chat.function("create_contact", "Create or update a Brevo contact, optionally adding it to existing lists.", action_type="write", chain_callable=True, effects=["create:contact"], event="brevo-connector.create_contact", data_model=ContactResult)
+@chat.function("create_contact", "Create or update a Brevo contact, optionally adding it to existing lists.", action_type="write", chain_callable=True, effects=[], event="brevo-connector.create_contact", data_model=ContactResult)
 async def create_contact(ctx, params: CreateContactParams) -> ActionResult:
     """Create a contact through Brevo's contacts endpoint."""
     conn, err = await resolve_or_error(ctx, params.connection_id)
