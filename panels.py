@@ -5,8 +5,7 @@ from app import ext
 import handlers_connection as h
 
 def _settings() -> ui.UINode:
-    return ui.Button("App settings", variant="secondary", size="sm", full_width=True,
-                     icon="settings", on_click=ui.Call("__panel__brevo_settings"))
+    return ui.Button("App settings", variant="secondary", size="sm", icon="settings", on_click=ui.Call("__panel__brevo_settings"))
 
 @ext.panel("home", slot="left")
 async def home(ctx, **kwargs) -> object:
@@ -24,12 +23,12 @@ async def home(ctx, **kwargs) -> object:
     else:
         children.extend([
             ui.Text("Connect an account", variant="label"),
-            ui.Button("Sign in with Brevo (OAuth 2.0)", variant="primary", size="sm", full_width=True, icon="login"),
+            ui.Button("Sign in with Brevo (OAuth 2.0)", variant="primary", size="sm", icon="login"),
             ui.Divider(),
             ui.Text("Or connect via API key", variant="caption"),
             form
         ])
-    children.extend([ui.Button("How do I set this up?", variant="secondary", size="sm", full_width=True, on_click=ui.OpenModal("brevo_setup")), _settings()])
+    children.extend([ui.Button("How do I set this up?", variant="secondary", size="sm", on_click=ui.OpenModal("brevo_setup")), _settings()])
     return ui.Stack(direction="v", gap=3, children=children)
 
 @ext.panel("brevo_setup", slot="overlay")
